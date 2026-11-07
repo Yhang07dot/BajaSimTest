@@ -1,0 +1,13 @@
+build/
+install/
+log/
+generated/
+results/
+recordings/
+__pycache__/
+.pytest_cache/
+*.pyc
+*.db3
+*.mcap
+core
+core.*

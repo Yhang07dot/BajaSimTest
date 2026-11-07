@@ -1,0 +1,16 @@
+# Shape reference only. Use current input header in an actual algorithm.
+header:
+  stamp: {sec: 12, nanosec: 0}
+  frame_id: base_link
+detections:
+  - header:
+      stamp: {sec: 12, nanosec: 0}
+      frame_id: base_link
+    results:
+      - hypothesis: {class_id: box, score: 0.92}
+    bbox:
+      center:
+        position: {x: 8.0, y: 3.0, z: 0.4}
+        orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}
+      size: {x: 0.8, y: 0.6, z: 0.8}
+    id: ""

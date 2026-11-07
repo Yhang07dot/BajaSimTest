@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>baja_perception_sim</name><version>0.1.0</version>
+  <description>Gazebo Harmonic perception test track and ROS 2 evaluation tools.</description>
+  <maintainer email="maintainer@example.com">Baja simulation team</maintainer><license>MIT</license>
+  <buildtool_depend>ament_python</buildtool_depend>
+  <depend>rclpy</depend><depend>sensor_msgs</depend><depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend><depend>vision_msgs</depend><depend>visualization_msgs</depend>
+  <depend>std_msgs</depend><depend>tf2_ros</depend><depend>baja_sim_interfaces</depend>
+  <exec_depend>baja_gz_bridge</exec_depend>
+  <exec_depend>launch_ros</exec_depend><exec_depend>ament_index_python</exec_depend>
+  <exec_depend>ros_gz_sim</exec_depend><exec_depend>ros_gz_bridge</exec_depend>
+  <exec_depend>rviz2</exec_depend><exec_depend>python3-numpy</exec_depend>
+  <exec_depend>python3-scipy</exec_depend><exec_depend>python3-yaml</exec_depend>
+  <exec_depend>python3-pil</exec_depend>
+  <test_depend>python3-pytest</test_depend>
+  <export><build_type>ament_python</build_type></export>
+</package>

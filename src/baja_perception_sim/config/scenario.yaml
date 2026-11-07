@@ -1,0 +1,59 @@
+schema_version: 1
+seed: 42
+track:
+  straight_x: 30.0
+  straight_y: 15.0
+  radius: 10.0
+  width: 12.0
+  sample_step: 0.2
+  cone_spacing: 0.5
+  cone_height: 0.30
+  cone_base_width: 0.24
+vehicle:
+  # Target speed in m/s. ./run.sh --speed VALUE overrides this for one run.
+  speed: 1.0
+  max_speed: 3.0
+  lookahead: 2.5
+  length: 2.8
+  width: 1.7
+  # Every object footprint must remain this far from the entire centreline.
+  # Half vehicle diagonal + 0.75m tolerance covers yaw and tracking errors.
+  clear_radius: 2.4
+lidar:
+  ground_height: 1.5
+  vertical_min_deg: -15.0
+  vertical_max_deg: 15.0
+  channels: 16
+  columns: 2000
+  rate: 10.0
+  min_range: 0.15
+  max_range: 100.0
+  noise_stddev: 0.01
+camera:
+  ground_height: 1.2
+  width: 1280
+  height: 720
+  rate: 20.0
+  horizontal_fov_deg: 90.0
+obstacles:
+  count: 32
+  classes: [box, barrel, cone, person]
+  min_gap: 0.5
+  # Start with several visible targets; the rest cover both sides of the loop.
+terrain:
+  enabled: true
+  sine_start: 8.0
+  sine_length: 5.0
+  sine_peak_to_peak: 0.15
+  sine_cycles: 3
+  crater_depth: 0.15
+  crater_radius: 0.65
+  bump_height: 0.15
+evaluation:
+  max_distance: 30.0
+  min_forward: 2.0
+  half_fov_deg: 75.0
+  min_lidar_hits: 1
+  match_distance: 1.0
+  confidence_threshold: 0.25
+  result_timeout: 2.0
