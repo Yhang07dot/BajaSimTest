@@ -49,6 +49,8 @@ def test_deterministic_scene_full_curve_clearance_and_real_mesh(tmp_path,cfg):
         distance=tree.query(obj['position'][:2])[0]
         assert distance-math.hypot(*obj['size'][:2])/2>=cfg['vehicle']['clear_radius']
     sdf=ET.parse(tmp_path/'a/world.sdf')
+    assert not any(m.get('name','').startswith('parking') for m in sdf.findall('.//model'))
+    assert not any(r['class_id']=='parking_bay' for r in a['regions'])
     sensor=sdf.find(".//sensor[@name='lidar']")
     assert sensor.findtext('lidar/scan/vertical/samples')=='16'
     assert sensor.findtext('lidar/scan/horizontal/samples')=='2000'

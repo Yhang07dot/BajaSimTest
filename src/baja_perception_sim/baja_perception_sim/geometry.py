@@ -112,3 +112,63 @@ def polyline_distances(points, segments):
             t = np.clip((p-a) @ v / max(float(v@v), 1e-12), 0, 1)
             result = np.minimum(result, np.linalg.norm(p - a - t[:, None]*v, axis=1))
     return result
+
+
+def clip_polylines(lines, min_forward, max_distance):
+    """Clip to a convex forward ROI, keeping gaps between separate polylines."""
+    out = []
+    for line in lines:
+        current = []
+        for a, b in zip(np.asarray(line)[:-1], np.asarray(line)[1:]):
+            a, b = np.asarray(a, dtype=float)[:2], np.asarray(b, dtype=float)[:2]
+            v = b-a
+            lo, hi = 0., 1.
+            aa = float(v@v)
+            if aa < 1e-12:
+                continue
+            bb, cc = float(2*a@v), float(a@a-max_distance**2)
+            disc = bb*bb-4*aa*cc
+            if disc < 0:
+                lo, hi = 1., 0.
+            else:
+                lo = max(lo, (-bb-math.sqrt(disc))/(2*aa))
+                hi = min(hi, (-bb+math.sqrt(disc))/(2*aa))
+            if abs(v[0]) < 1e-12:
+                if a[0] < min_forward:
+                    lo, hi = 1., 0.
+            elif v[0] > 0:
+                lo = max(lo, (min_forward-a[0])/v[0])
+            else:
+                hi = min(hi, (min_forward-a[0])/v[0])
+            if hi <= lo+1e-10:
+                if len(current) >= 2:
+                    out.append(np.array(current))
+                current = []
+                continue
+            start, end = a+lo*v, a+hi*v
+            if current and np.linalg.norm(current[-1]-start) > 1e-7:
+                out.append(np.array(current))
+                current = []
+            if not current:
+                current.append(start)
+            current.append(end)
+        if len(current) >= 2:
+            out.append(np.array(current))
+    return out
+
+
+def sample_polylines(lines, step):
+    """Uniform arc-length samples; input point density does not change score."""
+    samples = []
+    for line in lines:
+        line = np.asarray(line, dtype=float)
+        lengths = np.linalg.norm(np.diff(line, axis=0), axis=1)
+        keep = np.r_[True, lengths > 1e-9]
+        line = line[keep]
+        if len(line) < 2:
+            continue
+        arc = np.r_[0., np.cumsum(np.linalg.norm(np.diff(line, axis=0), axis=1))]
+        n = max(1, math.ceil(arc[-1]/step))
+        positions = (np.arange(n)+0.5)*arc[-1]/n
+        samples.append(np.column_stack([np.interp(positions, arc, line[:, j]) for j in range(2)]))
+    return np.concatenate(samples) if samples else np.empty((0, 2))

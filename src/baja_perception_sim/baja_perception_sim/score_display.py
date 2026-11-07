@@ -19,15 +19,18 @@ def format_score(result):
             lines += [f'{label}：{points(item.get("score_100"))}',
                       f'  Precision {percentage(item.get("precision"))}  Recall {percentage(item.get("recall"))}  F1 {percentage(item.get("f1"))}',
                       f'  正确 TP={item.get("tp", 0)}  误检 FP={item.get("fp", 0)}  漏检 FN={item.get("fn", 0)}']
+            if item.get('false_positive_penalty_100') is not None:
+                lines.append(f'  F1扣分分解：误检 {item["false_positive_penalty_100"]:.1f} 分，漏检 {item["false_negative_penalty_100"]:.1f} 分（不重复扣罚）')
     boundary = result.get('boundary', {})
     if boundary.get('status') == 'waiting_for_algorithm':
         lines.append('道路边界：等待算法输出 /perception/road_boundaries。')
     else:
         error = boundary.get('mean_error_on_covered_points_m')
         error_text = '--' if error is None else f'{error:.3f} m'
-        lines.append(f'道路边界：覆盖率 {percentage(boundary.get("coverage_within_0_5m"))}，已覆盖点平均误差 {error_text}')
+        lines.append(f'道路边界：{points(boundary.get("score_100"))}，精确率 {percentage(boundary.get("precision"))}，覆盖率 {percentage(boundary.get("recall",boundary.get("coverage_within_0_5m")))}，已覆盖点平均误差 {error_text}')
     lines += [f'已评分帧 {result.get("frames", 0)}  缺帧 {result.get("missing_frames", 0)}  不合法消息 {result.get("invalid_messages", 0)}',
-              '范围：前方 ROI 内有激光返回的三维目标；二维和特殊路面暂未计分。']
+              f'边界带障碍误检 {result.get("boundary_band_false_positives", 0)}  真值不完整跳过 {result.get("incomplete_truth_frames", 0)}',
+              '任务：三维目标与道路边线；边界锥桶报成障碍计误检。']
     return '\n'.join(lines)
 
 
@@ -39,7 +42,7 @@ def marker_text(result):
                    f'Classification: {points(result["semantic"]["score_100"])}')
     boundary = result.get('boundary', {})
     boundary_text = ('waiting for algorithm' if boundary.get('status') == 'waiting_for_algorithm'
-                     else percentage(boundary.get('coverage_within_0_5m')))
+                     else points(boundary.get('score_100')))
     return (f'PERCEPTION SCORE (F1 x 100)\n{objects}\n'
-            f'Boundary coverage: {boundary_text}\n'
+            f'Boundary geometry: {boundary_text}\n'
             f'Frames: {result.get("frames", 0)}   Missing: {result.get("missing_frames", 0)}')

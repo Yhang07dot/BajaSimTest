@@ -122,6 +122,10 @@ def generate(cfg, output, vehicle_template):
         raise ValueError('Terrain length and crater radius must be positive')
     if cfg['lidar']['channels'] != 16 or cfg['lidar']['columns'] != 2000:
         raise ValueError('Interface v0.1 expects 16 channels x 2000 columns')
+    for key in ['boundary_tolerance','boundary_sample_step','boundary_obstacle_band']:
+        value = cfg['evaluation'].get(key,0.5 if key!='boundary_obstacle_band' else 0.25)
+        if not math.isfinite(value) or value<=0:
+            raise ValueError(f'evaluation.{key} must be positive and finite')
     if tc['width']/2-0.6 < 3.4:
         raise ValueError('Default side obstacle bands need road width >=8m')
     if tc['radius'] <= tc['width']/2 + 1:
@@ -202,14 +206,6 @@ def generate(cfg, output, vehicle_template):
     for i in range(7):
         parts.append(static_model(f'zebra_{i}', component('paint', geometry('box', [10, 0.25, 0.003]), '0.95 0.95 0.9 1', collide=False), f'40 {15+i*0.5} 0.003 0 0 0'))
     regions.append({'class_id':'crosswalk','height':0.0,'polygon':[[34,14.8,0],[46,14.8,0],[46,18.3,0],[34,18.3,0]]})
-    # Parking bay protrudes beyond the west road edge, away from the driving corridor.
-    park = [[-16,16,0],[-19,16,0],[-19,22,0],[-16,22,0]]
-    regions.append({'class_id':'parking_bay','height':0.0,'polygon':park})
-    for i, (a,b) in enumerate(zip(park, park[1:]+park[:1])):
-        length = math.dist(a,b)
-        for j in range(math.ceil(length/0.5)):
-            p = np.array(a)+(np.array(b)-a)*j/math.ceil(length/0.5)
-            parts.append(static_model(f'parking_{i}_{j}', component('cone', geometry('cone',[0.24,0.24,0.3],cone_uri), RED), f'{p[0]} {p[1]} 0 0 0 0'))
     # Traffic fixtures outside the road: state encoded as explicit class labels.
     for kind, x, y, yaw in [('traffic_light_red',33,16,math.pi/2),('speed_limit_20',47,23,math.pi/2)]:
         body = component('pole', '<cylinder><radius>0.05</radius><length>2.4</length></cylinder>', '0.4 0.4 0.4 1', '0 0 1.2 0 0 0')

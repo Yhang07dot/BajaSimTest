@@ -108,6 +108,8 @@ def main():
         }
         if not args.algorithm or args.algorithm=='baja_algorithm_template':
             checks['example_zero_tp']=report.get('evaluation',{}).get('objectness',{}).get('tp')==0
+            checks['empty_boundary_zero_score']=report.get('evaluation',{}).get('boundary',{}).get('score_100')==0.
+        checks['two_tasks']=report.get('evaluation',{}).get('tasks')==['objects_3d','road_boundaries']
         checks={k:bool(v) for k,v in checks.items()}
         report['checks']=checks
         (output/'report.json').write_text(json.dumps(report,indent=2))

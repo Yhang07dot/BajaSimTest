@@ -1,4 +1,4 @@
-# 算法接入约定 v0.1
+# 算法接入约定 v0.2
 
 目标：算法独立 ROS 2 节点，启动后订阅传感器并发布结果，无需读取场景文件或调用 Gazebo 服务。`use_sim_time=true`，不订阅 `/ground_truth/*`；真值话题隔离仅为约定，不是访问控制。
 
@@ -8,8 +8,8 @@
 |---|---|---|---|
 | 三维目标 | vision_msgs/Detection3DArray | 时间戳、base_link、类别、置信度、框中心/姿态/尺寸 | 能，检出与分类分开 |
 | 道路边线 | baja_sim_interfaces/RoadBoundaryArray | 时间戳、base_link、左右属性、置信度、有序三维点 | 能 |
-| 相机二维目标 | vision_msgs/Detection2DArray | 图像时间戳、相机坐标系、类别、置信度、像素框 | 类型已约定，评分未实现 |
-| 特殊路面区域 | baja_sim_interfaces/SurfaceRegionArray | 时间戳、base_link、类型、置信度、轮廓；可选高度 | 类型已约定，评分未实现 |
+
+当前只要求上面两项任务的输出。相机可作为三维算法的辅助输入；不要求额外提交二维框。二维及路面区域类型仅为历史扩展，不是本轮待交付任务。消息字段兼容v0.1，评分JSON升级为schema_version=2。
 
 当前数值门限是基线，正式验收规则仍需确认，见 [evaluation.md](evaluation.md)。
 
@@ -49,7 +49,7 @@ ring=0..15 表示从最低到最高的线束顺序，角度 −15°、−13°、
 |---|---|
 | box | 随机箱体 |
 | barrel | 随机桶 |
-| cone | 随机目标锥桶；边界锥桶的评分处理尚待确认 |
+| cone | 随机目标锥桶；路边蓝红边界锥桶是背景，报成障碍计误检 |
 | person | 人形目标 |
 | unknown_obstacle | 仅判断为障碍、未分类；可参加检出分，不能视作类别正确 |
 | traffic_light_red | 当前固定红灯目标 |
@@ -85,14 +85,14 @@ detections:
 
 话题 `/perception/road_boundaries`，`baja_sim_interfaces/RoadBoundaryArray`，Reliable / Keep Last 10。header 同雷达参考时刻，base_link。
 
-每段 RoadBoundary：side=LEFT(1) / RIGHT(2)，confidence=0..1，points 为地面三维点，至少 2 个，按曲线顺序排列。不知道或看不清的一段留空隙，用多段消息表达；不要跨越空白强行连接。整帧没有结果发布空数组。
+每段 RoadBoundary：side=LEFT(1) / RIGHT(2)，confidence=0..1，points 为地面三维点，至少 2 个，按曲线顺序排列。不知道或看不清的一段留空隙，用多段消息表达；不要跨越空白强行连接。整帧没有结果发布空数组。评分只比较左右边线的水平几何，不要求提交锥桶检测。
 
 边界定义为沿道路锥桶**底面中心**的曲线。内部可以用任意模型拟合，输出统一采样成折线即可。
 
-## 扩展接口（当前不计分）
+## 保留扩展（不属于本轮任务）
 
 - `/perception/objects_2d`：`vision_msgs/Detection2DArray`，图像原始时间戳 / camera_optical_frame，框单位像素。像素原点左上，u右v下；不可把像素坐标放进三维框。
-- `/perception/surface_regions`：`baja_sim_interfaces/SurfaceRegionArray`，base_link。类型 `sine_wave / crater / speed_bump / crosswalk / parking_bay`；polygon 为有序轮廓，首尾隐式闭合；height 为估计凸起正高度/凹陷负深度，未知用 NaN。正弦区域 height 的含义为峰谷差。
+- `/perception/surface_regions`：`baja_sim_interfaces/SurfaceRegionArray`，base_link。类型 `sine_wave / crater / speed_bump / crosswalk`；polygon 为有序轮廓，首尾隐式闭合；height 为估计凸起正高度/凹陷负深度，未知用 NaN。正弦区域height为峰谷差。不要求算法实现该扩展。
 
 ## 开发流程
 

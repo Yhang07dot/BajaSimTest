@@ -56,4 +56,8 @@ evaluation:
   min_lidar_hits: 1
   match_distance: 1.0
   confidence_threshold: 0.25
+  boundary_tolerance: 0.5
+  boundary_sample_step: 0.5
+  # Ground-truth boundary band is background, not a target obstacle region.
+  boundary_obstacle_band: 0.25
   result_timeout: 2.0
