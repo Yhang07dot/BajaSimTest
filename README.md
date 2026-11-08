@@ -18,7 +18,6 @@ Ubuntu 22.04 / ROS 2 Humble / Gazebo Harmonic。车辆沿固定闭环低速行�
 | [后续会话交接](docs/handoff.md) | 后续任务顺序、文件范围与验收要求 |
 | [验收记录](docs/acceptance.md) | 已实际跑过的构建、测试、速度和GUI检查 |
 
-本会话聚焦**三维目标与道路边线两项题目、输出协议和评分**。停车位已删除，真实性增强暂缓。下一阶段先做真实使用传感器的示范算法，跑通后再供其他会话/团队替换正式算法；现有空模板不等于已完成示范算法。独立二维检测和特殊路面区域评分不在本轮。
 
 ## 快速运行
 
@@ -169,7 +168,7 @@ generated/                   本机生成场景与运行结果（不入库）
 
 Gazebo 使用 GPU 渲染传感器，无界面运行也需要可用的 EGL/OpenGL 环境。ROS 与 Gazebo 需要本地网络通信权限。启动默认 Gazebo partition 为 `baja_perception`；多实例运行需要分别配置 `GZ_PARTITION`、`ROS_DOMAIN_ID` 和 `--run-dir`。
 
-车辆模板改编自用户提供的 `baja_cloud_sim-2.7` 车辆模型；传感器与平台代码在此仓库独立维护。外部资料见 [设计记录](docs/design.md)。
+车辆模板改编自用户提供的 `baja_cloud_sim-2.7` 车辆模型(见https://github.com/PandaFixLe/baja_cloud_sim)；传感器与平台代码在此仓库独立维护。外部资料见 [设计记录](docs/design.md)。
 
 ## 脚本用途
 
