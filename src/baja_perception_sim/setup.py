@@ -18,7 +18,6 @@ setup(
         'generate = baja_perception_sim.scene:main',
         'platform = baja_perception_sim.platform:main',
         'evaluate = baja_perception_sim.evaluation:main',
-        'example_algorithm = baja_perception_sim.example:main',
         'inspect_sensors = baja_perception_sim.inspect:main',
     ]},
 )

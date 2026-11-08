@@ -1,8 +1,7 @@
 import copy
-import math
 
 import numpy as np
-from geometry_msgs.msg import Point, TransformStamped
+from geometry_msgs.msg import TransformStamped
 from scipy.spatial.transform import Rotation
 from sensor_msgs.msg import PointCloud2
 from vision_msgs.msg import Detection3D, Detection3DArray, ObjectHypothesisWithPose

@@ -47,7 +47,7 @@ cd /home/yaoh/BajaSimTest/baja_perception_sim
 ./run.sh --algorithm baja_algorithm_template  # 加载算法工作区模板
 ```
 
-`--example` 仅演示订阅点云和发布合法空结果，不包含识别算法。出现目标时示例召回率为 0，这也是验证评分管道的方式。实际算法接入时不要开启该开关，避免同话题多个发布者。
+`--example` 是 `--algorithm baja_algorithm_template` 的快捷方式，共用一个模板实现。它只演示订阅点云和发布合法空结果，不包含识别算法。出现目标时示例召回率为0；实际算法接入时不要同时启动它，避免同话题多个发布者。
 
 第二个终端：
 
@@ -154,7 +154,7 @@ python3 scripts/validate_live.py --sim-seconds 110
 
 ## 依赖与目录
 
-需要现有 ROS 2 Humble、Gazebo Harmonic、兼容的 `ros_gz`（本机为 `ros-humble-ros-gzharmonic-*`）、`vision_msgs`、`rviz2`、NumPy / SciPy / PyYAML，以及 `gz-transport13` / `gz-msgs10` 开发库以构建原生点云桥。测试的参考转换器另使用 `gz.msgs10` Python 消息；验收保存 JPEG 需 Pillow。不要混装冲突的 Fortress/Garden/Harmonic 桥接包。
+需要现有 ROS 2 Humble、Gazebo Harmonic、兼容的 `ros_gz`（本机为 `ros-humble-ros-gzharmonic-*`）、`vision_msgs`、`rviz2`、NumPy / SciPy / PyYAML，以及 `gz-transport13` / `gz-msgs10` 开发库以构建原生点云桥。Python测试不再依赖Gazebo Python绑定；验收保存JPEG需Pillow。不要混装冲突的Fortress/Garden/Harmonic桥接包。
 
 ```text
 src/baja_sim_interfaces/      边线、路面区域消息
@@ -170,3 +170,18 @@ generated/                   本机生成场景与运行结果（不入库）
 Gazebo 使用 GPU 渲染传感器，无界面运行也需要可用的 EGL/OpenGL 环境。ROS 与 Gazebo 需要本地网络通信权限。启动默认 Gazebo partition 为 `baja_perception`；多实例运行需要分别配置 `GZ_PARTITION`、`ROS_DOMAIN_ID` 和 `--run-dir`。
 
 车辆模板改编自用户提供的 `baja_cloud_sim-2.7` 车辆模型；传感器与平台代码在此仓库独立维护。外部资料见 [设计记录](docs/design.md)。
+
+## 脚本用途
+
+| 入口 | 用途 |
+|---|---|
+| build.sh / run.sh / test.sh | 构建、启动和单元测试 |
+| score.sh → scripts/show_score.py | 不启动ROS的终端评分查看 |
+| debug_rviz.sh | 为已运行仿真单独增加无真值窗口 |
+| inspect_sensors节点 | 连接已有仿真检查传感器，不启动新仿真 |
+| scripts/record_short.sh | 可选1～5秒点云录制，默认2秒 |
+| scripts/validate_live.py | 自己启动/清理隔离仿真，完整检查传感器、运动和评分 |
+| scripts/validate_speeds.sh | 复用validate_live验证2/3m/s |
+| scripts/validate_rviz_controls.py | 可选X11界面回归，操作其创建的临时RViz窗口 |
+
+本地 `AGENTS.md` / `Agents.md` 不入Git；面向组员的开发与交接说明在README和docs中。

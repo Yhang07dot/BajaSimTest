@@ -6,7 +6,7 @@
 
 - 环境：Ubuntu 22.04.5、ROS 2 Humble、Gazebo Sim 8.15.0；GUI检查使用本机X11。
 - 四个包构建通过：baja_sim_interfaces、baja_gz_bridge、baja_perception_sim、baja_algorithm_template。
-- 当前24项pytest通过，覆盖场景复现、通行间隙、高速参数、点云转换、误检扣分、边界带背景、多画/漏画/左右颠倒边线、ROI裁剪及采样密度独立性。旧16项记录属于此前基线。
+- 最近的两任务基线有24项pytest通过。清理后以实际使用的点云解码测试替换旧Python桥副本测试，包含大小端与行填充，现共25项；覆盖场景复现、通行间隙、高速参数、误检扣分、边线错误、ROI与采样密度。旧16项记录属于此前基线。
 - 真实传感器输出：16×2000 XYZIR点云、lidar_link；1280×720 rgb8相机图像、camera_optical_frame，fx=640。
 - 模板能通过 `--algorithm baja_algorithm_template` 加载；输出空结果，出现有效目标时得到零召回，未用真值伪造识别结果。
 - 评分JSON、ROS摘要、评分Marker和 `./score.sh` 均实际接通；没有算法时显示等待。

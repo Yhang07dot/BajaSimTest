@@ -8,6 +8,7 @@
   <depend>nav_msgs</depend><depend>vision_msgs</depend><depend>visualization_msgs</depend>
   <depend>std_msgs</depend><depend>tf2_ros</depend><depend>baja_sim_interfaces</depend>
   <exec_depend>baja_gz_bridge</exec_depend>
+  <exec_depend>baja_algorithm_template</exec_depend>
   <exec_depend>launch_ros</exec_depend><exec_depend>ament_index_python</exec_depend>
   <exec_depend>ros_gz_sim</exec_depend><exec_depend>ros_gz_bridge</exec_depend>
   <exec_depend>rviz2</exec_depend><exec_depend>python3-numpy</exec_depend>

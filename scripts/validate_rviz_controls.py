@@ -2,7 +2,6 @@
 """Exercise camera controls only in temporary RViz test windows (X11)."""
 import ctypes
 import json
-import os
 from pathlib import Path
 import re
 import shutil

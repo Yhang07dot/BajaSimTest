@@ -1,5 +1,6 @@
 import copy
 import math
+import struct
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
@@ -14,9 +15,8 @@ from baja_perception_sim.geometry import (track_length, track_pose, track_sample
                                          polyline_distances)
 from baja_perception_sim.geometry import pursuit_yaw_rate
 from baja_perception_sim.evaluation import score_frame, summarize
-from baja_perception_sim.cloud_bridge import convert
 from baja_perception_sim.ros_utils import cloud_xyz
-from gz.msgs10.pointcloud_packed_pb2 import PointCloudPacked
+from sensor_msgs.msg import PointCloud2, PointField
 
 ROOT=Path(__file__).resolve().parents[1]
 PKG=ROOT/'src/baja_perception_sim'
@@ -132,16 +132,18 @@ def test_oriented_box_visibility():
     assert points_in_box([[1,2,0],[2,1,0]],o).tolist()==[True,False]
 
 
-def test_cloud_bridge_preserves_timestamp_and_float_bytes():
-    msg=PointCloudPacked();msg.width=2;msg.height=2;msg.point_step=16;msg.row_step=32
-    msg.header.stamp.sec=123;msg.header.stamp.nsec=456
-    for i,name in enumerate(['x','y','z','intensity']):
-        f=msg.field.add();f.name=name;f.offset=i*4;f.datatype=6;f.count=1
-    values=np.array([[1,2,3,4],[5,6,7,8],[9,10,11,12],[np.inf,0,0,0]],dtype='<f4')
-    msg.data=values.tobytes()
-    out=convert(msg)
-    assert out.header.stamp.sec==123 and out.header.stamp.nanosec==456
-    assert out.header.frame_id=='lidar_link'
-    assert np.allclose(cloud_xyz(out),values[:3,:3])
-    rings=np.ndarray((2,2),dtype='<u2',buffer=out.data,offset=16,strides=(out.row_step,out.point_step))
-    assert rings.tolist()==[[0,0],[1,1]]
+@pytest.mark.parametrize('bigendian',[False,True])
+def test_runtime_cloud_reader_handles_padding_and_invalid_returns(bigendian):
+    msg=PointCloud2()
+    msg.width=2;msg.height=2;msg.point_step=20;msg.row_step=64
+    msg.is_bigendian=bigendian
+    msg.fields=[PointField(name=n,offset=i*4,datatype=PointField.FLOAT32,count=1)
+                for i,n in enumerate(['x','y','z','intensity'])]
+    msg.fields.append(PointField(name='ring',offset=16,datatype=PointField.UINT16,count=1))
+    values=[[1,2,3],[4,5,6],[7,8,9],[float('inf'),0,0]]
+    data=bytearray(msg.row_step*msg.height)
+    for i,p in enumerate(values):
+        offset=(i//2)*msg.row_step+(i%2)*msg.point_step
+        struct.pack_into(('>' if bigendian else '<')+'fff',data,offset,*p)
+    msg.data=bytes(data)
+    assert np.allclose(cloud_xyz(msg),values[:3])

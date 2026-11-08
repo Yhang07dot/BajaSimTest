@@ -11,3 +11,7 @@ __pycache__/
 *.mcap
 core
 core.*
+# Local agent instructions (retain on disk, do not commit).
+AGENTS.md
+Agents.md
+agents.md

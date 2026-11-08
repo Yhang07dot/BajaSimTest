@@ -31,6 +31,8 @@ def start(context):
     algorithm = arg('algorithm').strip()
     if algorithm and enabled('example'):
         raise ValueError('--algorithm and --example are mutually exclusive')
+    if enabled('example'):
+        algorithm='baja_algorithm_template'
     mode = arg('rviz_mode')
     if mode not in ['debug','evaluation','both']:
         raise ValueError('rviz_mode must be debug, evaluation or both')
@@ -40,8 +42,6 @@ def start(context):
     nodes.append(Node(package='baja_gz_bridge',executable='cloud_bridge',parameters=[{'use_sim_time':True}],output='screen'))
     for executable in ['platform','evaluate']:
         nodes.append(Node(package='baja_perception_sim',executable=executable,parameters=[params],output='screen'))
-    if enabled('example'):
-        nodes.append(Node(package='baja_perception_sim',executable='example_algorithm',parameters=[{'use_sim_time':True}],output='screen'))
     if algorithm:
         entry = Path(get_package_share_directory(algorithm)) / 'launch/perception.launch.py'
         if not entry.is_file():

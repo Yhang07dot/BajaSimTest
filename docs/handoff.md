@@ -20,7 +20,7 @@
 
 ```text
 仓库：/home/yaoh/BajaSimTest/baja_perception_sim
-先读：AGENTS.md、docs/tasks.md、docs/interfaces.md、docs/evaluation.md
+先读：README.md、docs/tasks.md、docs/interfaces.md、docs/evaluation.md
 建议新包：src/algorithms/baja_demo_perception/
 入口：安装launch/perception.launch.py，支持--algorithm baja_demo_perception
 输入：只允许传感器消息和TF，不读真值、场景物体清单或seed位置

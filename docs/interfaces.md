@@ -61,6 +61,8 @@ base_link：x前、y左、z上；目标位置必须在**采集时刻**的车体�
 
 示例结构：
 
+可复制的独立文件见 [box_result.yaml](../examples/box_result.yaml)。其中固定时间戳仅用于说明结构，实际输出须使用当前输入帧时间。
+
 ```yaml
 header:
   stamp: {sec: 12, nanosec: 0}
